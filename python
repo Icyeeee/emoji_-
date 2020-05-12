@@ -1,0 +1,49 @@
+# 导入第三方的http的请求库
+# pip install requests
+
+import requests
+import re
+
+#定义函数 目的：获取每张要爬取图片的地址
+#1.找到目标网页https://www.fabiaoqing.com源代码数据
+#2.正则匹配不同图片的地址 产生匹配之后的结果
+#3.通过源代码和匹配之后的结果来找到爬去图片
+
+def get_urls():
+
+  #第一步
+  response = requests.get('https://fabiaoqing.com/biaoqing')
+
+  #第二步保留相同的class="bqbppdetail lazy"
+  #.*表示匹配任意数量不换行的字符
+  #/bmiddle/006qir4oly1gdd5e2gzfdj30m80epabq.jpg
+  #<img class="ui small bordered image bqpp lazy" data-original="http://wx1.sinaimg.cn/bmiddle/ceeb653ely1gejkp1xsdtj20d60e0gm5.jpg
+  #<img class="ui small bordered image bqpp lazy" data-original="http://wx1.sinaimg.cn/bmiddle/ceeb653ely1gek5i7bnh1j20m80kp3zw.jpg"
+  url_add = r'<img class="ui image lazy" data-original="(.*?)"'
+
+  #第三步
+  url_list = re.findall(url_add,response.text)
+
+  #print(url_list)
+  return url_list
+
+
+# 找到地址 可以下载了
+#定义第二个函数 目的：下载数据（爬取的图片）
+
+def get_gif(url,name):
+  response = requests.get(url)
+  #/Users/yinglebing/Desktop/animal forests response.text源代码 response.content二进制
+
+  with open('/Users/yinglebing/Desktop/animal forests/%d.gif'%name,'wb') as ft:
+    ft.write(response.content)
+
+if __name__ == '__main__':
+  url_list = get_urls()
+  #定义一个变量 目的：给图片命名
+  a = 50
+  for url in url_list:
+    com_url = url
+    get_gif(com_url,a)
+    a += 1
+    print(com_url)
